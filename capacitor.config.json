@@ -1,0 +1,6 @@
+{
+  "appId": "com.shield.app",
+  "appName": "SHIELD",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}

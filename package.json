@@ -1,0 +1,13 @@
+{
+  "name": "shield-app",
+  "version": "1.0.0",
+  "description": "SHIELD Focus App",
+  "scripts": {
+    "build": "echo build complete"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/cli": "^7.0.0",
+    "@capacitor/core": "^7.0.0"
+  }
+}
