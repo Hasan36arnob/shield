@@ -2,48 +2,206 @@
 <html>
 
 <head>
-
-  <meta charset="UTF-8">
-
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
-
-  <title>SHIELD</title>
-
-  <link rel="stylesheet" href="style.css">
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SHIELD Store</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
+  <header class="appbar">
+    <div class="brand" onclick="navigate('catalog')">
+      <span class="brand__logo">🛡️</span>
+      <span class="brand__name">SHIELD</span>
+    </div>
 
-<div class="container">
+    <nav class="nav">
+      <button class="nav__btn" data-nav="catalog" onclick="navigate('catalog')">Shop</button>
+      <button class="nav__btn" data-nav="orders" onclick="navigate('orders')">Orders</button>
+      <button class="nav__btn nav__btn--cart" data-nav="cart" onclick="navigate('cart')">
+        Cart
+        <span id="cartCount" class="badge">0</span>
+      </button>
+    </nav>
+  </header>
 
-  <h1>SHIELD</h1>
+  <main class="main">
+    <!-- Catalog -->
+    <section id="view-catalog" class="view">
+      <div class="hero">
+        <div>
+          <h1 class="hero__title">Shop discipline.</h1>
+          <p class="hero__subtitle">Fast add-to-cart demo ecommerce. Data is stored locally on this device.</p>
+        </div>
+        <div class="hero__actions">
+          <div class="search">
+            <input id="searchInput" type="search" placeholder="Search products..." oninput="onSearch()" />
+          </div>
+          <div class="filters">
+            <select id="categorySelect" onchange="onCategoryChange()">
+              <option value="all">All categories</option>
+              <option value="apparel">Apparel</option>
+              <option value="gear">Gear</option>
+              <option value="books">Books</option>
+              <option value="accessories">Accessories</option>
+            </select>
+          </div>
+        </div>
+      </div>
 
-  <h2 id="streak">
-    Clean Days: 0
-  </h2>
+      <div class="sectionHeader">
+        <h2>Products</h2>
+        <div class="sectionHeader__meta" id="resultsMeta"></div>
+      </div>
 
-  <div id="quote">
-    Discipline creates freedom.
-  </div>
+      <div id="productGrid" class="grid"></div>
 
-  <div id="timer">
-    05:00
-  </div>
+      <div class="empty" id="catalogEmpty" hidden>
+        No products match your filters.
+      </div>
+    </section>
 
-  <button onclick="startFocus()">
-    EMERGENCY MODE
-  </button>
+    <!-- Product detail modal -->
+    <div id="productModalOverlay" class="modalOverlay" hidden onclick="closeProductModal()">
+      <div class="modal" onclick="event.stopPropagation()" role="dialog" aria-modal="true">
+        <div class="modal__top">
+          <div>
+            <h3 id="modalTitle" class="modal__title"></h3>
+            <div id="modalMeta" class="modal__meta"></div>
+          </div>
+          <button class="iconBtn" onclick="closeProductModal()" aria-label="Close">✕</button>
+        </div>
 
-  <button onclick="resetStreak()"
-          class="reset">
-    RESET
-  </button>
+        <div class="modal__body">
+          <div class="modal__img" id="modalImage">🛡️</div>
+          <div class="modal__info">
+            <p id="modalDescription" class="modal__desc"></p>
+            <div class="priceRow">
+              <div class="price">
+                <span class="price__label">Price</span>
+                <span id="modalPrice" class="price__value"></span>
+              </div>
+              <div class="stock" id="modalStock"></div>
+            </div>
 
-</div>
+            <div class="qtyRow">
+              <button class="qtyBtn" onclick="changeQty(-1)">-</button>
+              <input id="modalQty" class="qtyInput" type="number" min="1" value="1" oninput="onModalQtyInput()" />
+              <button class="qtyBtn" onclick="changeQty(1)">+</button>
+            </div>
 
-<script src="app.js"></script>
+            <div class="modal__cta">
+              <button class="primaryBtn" onclick="addModalToCart()">Add to cart</button>
+              <button class="secondaryBtn" onclick="addModalToCart(true)">Buy now</button>
+            </div>
 
+            <div class="fineprint">
+              Checkout is a demo: placing an order will store it in your local order history.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cart -->
+    <section id="view-cart" class="view" hidden>
+      <div class="sectionHeader">
+        <h2>Your cart</h2>
+        <div class="sectionHeader__meta">
+          <button class="linkBtn" onclick="clearCart()">Clear cart</button>
+        </div>
+      </div>
+
+      <div id="cartItems" class="cart"></div>
+
+      <div class="cartSummary" id="cartSummary" hidden>
+        <div class="sumRow"><span>Subtotal</span><span id="sumSubtotal"></span></div>
+        <div class="sumRow"><span>Estimated tax</span><span id="sumTax"></span></div>
+        <div class="sumRow sumRow--total"><span>Total</span><span id="sumTotal"></span></div>
+        <button class="primaryBtn" onclick="navigate('checkout')" id="goCheckoutBtn">Checkout</button>
+      </div>
+
+      <div class="empty" id="cartEmpty" hidden>
+        Your cart is empty.
+        <div class="empty__actions">
+          <button class="secondaryBtn" onclick="navigate('catalog')">Go to shop</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Checkout -->
+    <section id="view-checkout" class="view" hidden>
+      <div class="sectionHeader">
+        <h2>Checkout</h2>
+        <div class="sectionHeader__meta">
+          <button class="linkBtn" onclick="navigate('cart')">Back to cart</button>
+        </div>
+      </div>
+
+      <div class="checkout">
+        <div class="card">
+          <h3 class="card__title">Shipping details</h3>
+
+          <div class="formGrid">
+            <label>
+              Full name
+              <input id="shipName" type="text" placeholder="Jane Doe" />
+            </label>
+            <label>
+              Email
+              <input id="shipEmail" type="email" placeholder="jane@example.com" />
+            </label>
+            <label>
+              Address
+              <input id="shipAddress" type="text" placeholder="123 Main St" />
+            </label>
+            <label>
+              Phone
+              <input id="shipPhone" type="tel" placeholder="+1 555 123 4567" />
+            </label>
+          </div>
+
+          <div class="formRow">
+            <label class="checkbox">
+              <input id="agreeTerms" type="checkbox" checked />
+              <span>I understand this is a demo checkout.</span>
+            </label>
+          </div>
+
+          <button class="primaryBtn" onclick="placeOrder()">Place order</button>
+          <div id="checkoutError" class="error" hidden></div>
+        </div>
+
+        <div class="card card--sticky">
+          <h3 class="card__title">Order summary</h3>
+          <div id="checkoutSummary" class="checkoutSummary"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Orders -->
+    <section id="view-orders" class="view" hidden>
+      <div class="sectionHeader">
+        <h2>Order history</h2>
+        <div class="sectionHeader__meta">
+          <button class="linkBtn" onclick="resetDemoData()">Reset demo</button>
+        </div>
+      </div>
+
+      <div id="ordersList" class="orders"></div>
+
+      <div class="empty" id="ordersEmpty" hidden>
+        No orders yet. Place an order to see it here.
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>SHIELD Store • local demo ecommerce</span>
+  </footer>
+
+  <script src="app.js"></script>
 </body>
+
 </html>
+
