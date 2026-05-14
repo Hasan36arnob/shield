@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch: # Allows you to run the build manually
+  workflow_dispatch:
 
 jobs:
   build:
@@ -14,11 +14,11 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v4
 
-      - name: Setup Java (Required for Android)
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu' # or 'temurin'
-          java-version: '21'    # Capacitor 7 requires Java 21
+          distribution: 'zulu'
+          java-version: '21'
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -29,14 +29,16 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      # IMPORTANT: Capacitor looks for the 'www' folder. 
-      # If your project uses a framework (React/Vue), run your build command here.
-      # Since your project is plain HTML, we just ensure the directory exists.
+      # THIS STEP FIXES THE PERMISSION DENIED ERROR
+      - name: Fix Capacitor Permissions
+        run: chmod +x ./node_modules/.bin/cap
+
       - name: Build Web Assets
         run: npm run build
 
+      # Use 'npm exec' instead of 'npx' for better reliability in CI
       - name: Sync Capacitor
-        run: npx cap sync android
+        run: npm exec cap sync android
 
       - name: Build Android Debug APK
         run: |
