@@ -24,11 +24,11 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Add Android
-        run: npx cap add android
+      - name: Add Android Platform
+        run: npx capacitor add android
 
-      - name: Copy Files
-        run: npx cap copy
+      - name: Copy Web Files
+        run: npx capacitor copy android
 
       - name: Build APK
         run: |
